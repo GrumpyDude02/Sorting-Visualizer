@@ -13,16 +13,6 @@ int main(int argc, char *argv[])
     SDL_zero(sp);
     Beeper *beep = InitializeBepper(BUFFER_SIZE, AMPLITUDE, SAMPLE_RATE, CHANNELS, 440.0f);
     float f = 400;
-    while (1)
-    {
-        SDL_PauseAudioDevice(beep->device, 0);
-        printf("%f\n", f);
-        SDL_Delay(20);
-        SDL_PauseAudioDevice(beep->device, 1);
-        f += 0.1;
-        AddTone(beep, f);
-    }
-
     if (beep == NULL)
         return -1;
     SortingAlgorithm sort[] = {
