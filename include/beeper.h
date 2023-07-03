@@ -15,7 +15,7 @@ typedef struct Beeper
     int sample_rate;
     int channels;
     float tone;
-    float time;
+    Uint64 sample_played;
     SDL_AudioDeviceID device;
 } Beeper;
 

@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include "beeper.h"
 
-int sample_nr = 0;
 Beeper *InitializeBepper(int buffer, int amplitude, int sample_rate, int channel, float tone)
 {
     Beeper *beeper = (Beeper *)malloc(sizeof(Beeper));
@@ -17,6 +16,7 @@ Beeper *InitializeBepper(int buffer, int amplitude, int sample_rate, int channel
     beeper->sample_rate = sample_rate;
     beeper->channels = channel;
     beeper->tone = tone;
+    beeper->sample_played = 0;
     if (RequestDevice(beeper) == -1)
         return NULL;
     return beeper;
@@ -45,54 +45,20 @@ int RequestDevice(Beeper *beeper)
 
 void AddTone(Beeper *beeper, float freq)
 {
-    beeper->time = 0;
     beeper->tone = freq;
 }
 
-#define FADE_DURATION 0.01 // 10 milliseconds
-
 static void AddSamples(Beeper *beeper, Sint16 *stream, int len)
 {
-    double period = 2 * M_PI * beeper->tone / beeper->sample_rate;
-    double x = 0;
+    memset(stream, 0, len / sizeof(Sint16));
     int samples = len / sizeof(Sint16);
-
-    // Apply linear fade-in and fade-out
-    double fadeLength = beeper->sample_rate * FADE_DURATION;
-    double fadeStep = 1.0 / fadeLength;
-    double fadeValue = 0.0;
-
     for (int i = 0; i < samples; i++)
     {
-        double sampleValue = beeper->amplitude * sin(x);
-
-        // Apply fade-in and fade-out
-        if (i < fadeLength)
-        {
-            sampleValue *= fadeValue;
-            fadeValue += fadeStep;
-        }
-        else if (i > samples - fadeLength)
-        {
-            sampleValue *= fadeValue;
-            fadeValue -= fadeStep;
-        }
-
-        stream[i] = (Sint16)sampleValue;
-        x += period;
+        double time = 2.0 * M_PI * (beeper->sample_played + i) / beeper->sample_rate;
+        stream[i] = (Sint16)(beeper->amplitude * sin(time * beeper->tone));
     }
+    beeper->sample_played += samples;
 }
-
-// static void AddSamples(Beeper *beeper, Sint16 *stream, int len)
-// {
-//     double period = 2 * M_PI * beeper->tone / beeper->sample_rate;
-//     double x = 0;
-//     for (int i = 0; i < len; i++)
-//     {
-//         stream[i] = (Sint16)(beeper->amplitude * sin(x));
-//         x += period;
-//     }
-// }
 
 void AudioCallBack(void *user_data, Uint8 *stream, int len)
 {
