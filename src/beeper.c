@@ -17,6 +17,8 @@ Beeper *InitializeBepper(int buffer, int amplitude, int sample_rate, int channel
     beeper->channels = channel;
     beeper->tone = tone;
     beeper->sample_played = 0;
+    beeper->SoundOn = 0;
+    beeper->ocs_type = 1;
     if (RequestDevice(beeper) == -1)
         return NULL;
     return beeper;
@@ -48,14 +50,37 @@ void AddTone(Beeper *beeper, float freq)
     beeper->tone = freq;
 }
 
+double osc(int type, double x)
+{
+    switch (type)
+    {
+    case 0:
+        return sin(x);
+        break;
+    case 1:
+        return sin(x) < 0.0 ? -1.0 : 1.0;
+    default:
+        break;
+    }
+}
+double Fade(Beeper *beeper, double *amp)
+{
+    if (*amp < AMPLITUDE && beeper->SoundOn)
+        *amp = *amp + 10;
+    else if (*amp > 0.0 && !beeper->SoundOn)
+        *amp = *amp - 10;
+    return beeper->amplitude;
+}
+
 static void AddSamples(Beeper *beeper, Sint16 *stream, int len)
 {
     memset(stream, 0, len / sizeof(Sint16));
     int samples = len / sizeof(Sint16);
+    double amp = 0;
     for (int i = 0; i < samples; i++)
     {
-        double time = 2.0 * M_PI * (beeper->sample_played + i) / beeper->sample_rate;
-        stream[i] = (Sint16)(beeper->amplitude * sin(time * beeper->tone));
+        double x = (2.0 * M_PI * (beeper->sample_played + i) / beeper->sample_rate) * beeper->tone;
+        stream[i] = (Sint16)(beeper->amplitude / 2 * osc(1, x));
     }
     beeper->sample_played += samples;
 }
@@ -63,6 +88,15 @@ static void AddSamples(Beeper *beeper, Sint16 *stream, int len)
 void AudioCallBack(void *user_data, Uint8 *stream, int len)
 {
     AddSamples((Beeper *)user_data, (Sint16 *)stream, len);
+}
+
+void Beep(Beeper *beeper, int duration)
+{
+    beeper->SoundOn = 1;
+    SDL_PauseAudioDevice(beeper->device, 0);
+    SDL_Delay(duration);
+    SDL_PauseAudioDevice(beeper->device, 1);
+    beeper->SoundOn = 0;
 }
 
 void DetroyBeeper(Beeper *beeper)

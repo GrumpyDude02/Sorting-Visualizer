@@ -2,7 +2,7 @@
 #ifndef BEEPER_H
 #define BEEPER_H
 
-#define AMPLITUDE 32000
+#define AMPLITUDE 10000
 #define CHANNELS 1
 #define SAMPLE_RATE 44100
 #define BUFFER_SIZE 4096
@@ -15,6 +15,8 @@ typedef struct Beeper
     int sample_rate;
     int channels;
     float tone;
+    Uint8 SoundOn;
+    int ocs_type;
     Uint64 sample_played;
     SDL_AudioDeviceID device;
 } Beeper;
@@ -22,7 +24,7 @@ typedef struct Beeper
 Beeper *InitializeBepper(int buffer, int amplitude, int sample_rate, int channel, float tone);
 int RequestDevice(Beeper *beeper);
 void AddTone(Beeper *beeper, float freq);
-void PlaySounds(Beeper *beeper, int duration);
+void Beep(Beeper *beeper, int duration);
 void DetroyBeeper(Beeper *beeper);
 void AudioCallBack(void *beeper, Uint8 *stream, int len);
 

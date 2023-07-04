@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
+#include "beeper.h"
 #include "my_structs.h"
 
 #ifndef BAR_H
@@ -17,6 +18,7 @@ typedef struct
     int middle;
     int end_index;
     int bar_number;
+    Beeper *beeper;
 } SortingParams;
 
 void swap(Bar *b1, Bar *b2);

@@ -9,6 +9,11 @@ void swap(Bar *b1, Bar *b2)
     *b2 = temp;
 }
 
+float map(float value, float inputMin, float inputMax, float outputMin, float outputMax)
+{
+    return ((value - inputMin) / (inputMax - inputMin)) * (outputMax - outputMin) + outputMin;
+}
+
 void draw_bars(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp)
 {
     SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
@@ -19,16 +24,25 @@ void draw_bars(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp)
         {
             SDL_SetRenderDrawColor(rend, 255, 0, 0, 255);
             arr[i].activity = inactive;
+            float f = map(arr[i].value, 0, sp.bar_number, 90.f, 600.f);
+            AddTone(sp.beeper, f);
+            Beep(sp.beeper, 5);
         }
         else if (arr[i].activity == compare2)
         {
             SDL_SetRenderDrawColor(rend, 0, 255, 0, 255);
             arr[i].activity = inactive;
+            float f = map(arr[i].value, 0, sp.bar_number, 90.f, 600.f);
+            AddTone(sp.beeper, f);
+            Beep(sp.beeper, 5);
         }
         else if (arr[i].activity == pivot_element)
         {
             SDL_SetRenderDrawColor(rend, 255, 0, 255, 255);
             arr[i].activity = inactive;
+            float f = map(arr[i].value, 0, sp.bar_number, 90.f, 600.f);
+            AddTone(sp.beeper, f);
+            Beep(sp.beeper, 5);
         }
         else
         {
@@ -209,7 +223,7 @@ static void merge(Bar *arr, SDL_Renderer *rend, int start, int mid, int end, Win
             arr[mid + 1 + j].activity = compare1;
             temp[k++] = arr[mid + 1 + j++];
         }
-        SDL_Delay(20);
+        // SDL_Delay(20);
         draw_bars(arr, rend, dim, sp);
     }
 
@@ -223,7 +237,7 @@ static void merge(Bar *arr, SDL_Renderer *rend, int start, int mid, int end, Win
         }
 
         arr[start + t] = temp[t];
-        SDL_Delay(20);
+        // SDL_Delay(20);
         draw_bars(arr, rend, dim, sp);
     }
 }
@@ -264,7 +278,6 @@ void insertion_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams 
             arr[i].activity = compare1;
             j--;
             draw_bars(arr, rend, dim, sp);
-            SDL_Delay(20);
         }
         arr[j + 1] = key;
     }
