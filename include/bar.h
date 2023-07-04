@@ -18,6 +18,7 @@ typedef struct
     int middle;
     int end_index;
     int bar_number;
+    int duration;
     Beeper *beeper;
 } SortingParams;
 

@@ -13,7 +13,6 @@ int main(int argc, char *argv[])
     SDL_zero(sp);
     Beeper *beep = InitializeBepper(BUFFER_SIZE, AMPLITUDE, SAMPLE_RATE, CHANNELS, 440.0f);
     sp.beeper = beep;
-    float f = 400;
     if (beep == NULL)
         return -1;
     SortingAlgorithm sort[] = {
@@ -30,6 +29,11 @@ int main(int argc, char *argv[])
         {
             sp.bar_number = get_int("Enter the number of bars (max = 600) : ");
         } while (sp.bar_number < 0 || sp.bar_number > 600);
+
+        do
+        {
+            sp.duration = get_int("Enter the delay duration (max = 100): ");
+        } while (sp.duration < 0 || sp.duration > 100);
 
         dimensions.cell_h = dimensions.HEIGHT / (float)sp.bar_number;
         dimensions.cell_w = dimensions.WIDTH / (float)sp.bar_number;

@@ -90,13 +90,16 @@ void AudioCallBack(void *user_data, Uint8 *stream, int len)
     AddSamples((Beeper *)user_data, (Sint16 *)stream, len);
 }
 
-void Beep(Beeper *beeper, int duration)
+void Beep(Beeper *beeper, int duration, int pause)
 {
     beeper->SoundOn = 1;
     SDL_PauseAudioDevice(beeper->device, 0);
     SDL_Delay(duration);
-    SDL_PauseAudioDevice(beeper->device, 1);
-    beeper->SoundOn = 0;
+    if (pause)
+    {
+        SDL_PauseAudioDevice(beeper->device, 1);
+        beeper->SoundOn = 0;
+    }
 }
 
 void DetroyBeeper(Beeper *beeper)

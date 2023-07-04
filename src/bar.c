@@ -26,23 +26,17 @@ void draw_bars(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp)
             arr[i].activity = inactive;
             float f = map(arr[i].value, 0, sp.bar_number, 90.f, 600.f);
             AddTone(sp.beeper, f);
-            Beep(sp.beeper, 5);
+            Beep(sp.beeper, 0, 0);
         }
         else if (arr[i].activity == compare2)
         {
             SDL_SetRenderDrawColor(rend, 0, 255, 0, 255);
             arr[i].activity = inactive;
-            float f = map(arr[i].value, 0, sp.bar_number, 90.f, 600.f);
-            AddTone(sp.beeper, f);
-            Beep(sp.beeper, 5);
         }
         else if (arr[i].activity == pivot_element)
         {
             SDL_SetRenderDrawColor(rend, 255, 0, 255, 255);
             arr[i].activity = inactive;
-            float f = map(arr[i].value, 0, sp.bar_number, 90.f, 600.f);
-            AddTone(sp.beeper, f);
-            Beep(sp.beeper, 5);
         }
         else
         {
@@ -52,6 +46,8 @@ void draw_bars(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp)
         SDL_RenderFillRectF(rend, &r);
     }
     SDL_RenderPresent(rend);
+    SDL_Delay(sp.duration);
+    SDL_PauseAudioDevice(sp.beeper->device, 1);
 }
 
 //-----------------------------sorting algorithms-------------------------
@@ -67,10 +63,10 @@ void bubble_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp,
                 *quit = true;
                 return;
             }
+            arr[j].activity = compare2;
+            arr[j + 1].activity = compare1;
             if (arr[j].value > arr[j + 1].value)
             {
-                arr[j].activity = compare1;
-                arr[j + 1].activity = compare2;
                 swap(&arr[j], &arr[j + 1]);
             }
             draw_bars(arr, rend, dim, sp);
@@ -92,10 +88,10 @@ void cocktail_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams s
                 *quit = true;
                 return;
             }
+            arr[j].activity = compare1;
+            arr[j + 1].activity = compare1;
             if (arr[j].value > arr[j + 1].value)
             {
-                arr[j].activity = compare1;
-                arr[j + 1].activity = compare1;
                 swap(&arr[j], &arr[j + 1]);
                 swap_flag = true;
             }
@@ -111,10 +107,10 @@ void cocktail_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams s
                 *quit = true;
                 return;
             }
+            arr[j].activity = compare1;
+            arr[j - 1].activity = compare1;
             if (arr[j].value < arr[j - 1].value)
             {
-                arr[j].activity = compare1;
-                arr[j - 1].activity = compare2;
                 swap(&arr[j], &arr[j - 1]);
                 swap_flag = true;
             }
@@ -136,12 +132,12 @@ void selection_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams 
                 *quit = true;
                 return;
             }
-            arr[j].activity = compare2;
+            arr[j].activity = compare1;
             if (min->value >= arr[j].value)
             {
                 min = &arr[j];
             }
-            min->activity = compare1;
+            min->activity = compare2;
             draw_bars(arr, rend, dim, sp);
         }
         Bar temp = *min;
@@ -162,7 +158,7 @@ static void quick_sort_unpacked(Bar *arr, int starting_index, int ending_index, 
     }
     Bar pivot = arr[ending_index];
     int pivot_index = starting_index;
-    arr[ending_index].activity = pivot_element;
+    arr[ending_index].activity = compare2;
     for (int i = starting_index; i < ending_index; i++)
     {
         SDL_PollEvent(&dim.ev);
@@ -171,14 +167,13 @@ static void quick_sort_unpacked(Bar *arr, int starting_index, int ending_index, 
             *quit = true;
             return;
         }
+        arr[pivot_index].activity = compare1;
+        arr[i].activity = compare1;
         if (arr[i].value <= pivot.value)
         {
-            arr[pivot_index].activity = compare1;
-            arr[i].activity = compare2;
             swap(&arr[i], &arr[pivot_index]);
             pivot_index++;
-        }
-        SDL_Delay(20);
+        };
         draw_bars(arr, rend, dim, sp);
     }
     swap(&arr[pivot_index], &arr[ending_index]);
@@ -223,7 +218,6 @@ static void merge(Bar *arr, SDL_Renderer *rend, int start, int mid, int end, Win
             arr[mid + 1 + j].activity = compare1;
             temp[k++] = arr[mid + 1 + j++];
         }
-        // SDL_Delay(20);
         draw_bars(arr, rend, dim, sp);
     }
 
@@ -237,7 +231,6 @@ static void merge(Bar *arr, SDL_Renderer *rend, int start, int mid, int end, Win
         }
 
         arr[start + t] = temp[t];
-        // SDL_Delay(20);
         draw_bars(arr, rend, dim, sp);
     }
 }
@@ -273,9 +266,9 @@ void insertion_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams 
                 *quit = true;
                 return;
             }
-            arr[j].activity = compare2;
+            arr[j].activity = compare1;
             arr[j + 1] = arr[j];
-            arr[i].activity = compare1;
+            arr[i].activity = compare2;
             j--;
             draw_bars(arr, rend, dim, sp);
         }
