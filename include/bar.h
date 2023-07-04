@@ -30,6 +30,8 @@ void bubble_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp,
 void selection_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit);
 void insertion_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit);
 void cocktail_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit);
+void gnome_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit);
+void odd_even_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit);
 
 //--logarithmic algorithms---
 void quick_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit);

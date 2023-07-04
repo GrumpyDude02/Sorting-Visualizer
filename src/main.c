@@ -21,7 +21,9 @@ int main(int argc, char *argv[])
         {selection_sort},
         {merge_sort},
         {insertion_sort},
-        {cocktail_sort}};
+        {cocktail_sort},
+        {gnome_sort},
+        {odd_even_sort}};
     int choice;
     while ((choice = get_choice()) != 0)
     {
@@ -41,6 +43,7 @@ int main(int argc, char *argv[])
         sp.end_index = sp.bar_number - 1;
         if (render_window(dimensions, choice, sp, sort) == -1)
         {
+            DetroyBeeper(beep);
             SDL_Quit();
             return -1;
         }

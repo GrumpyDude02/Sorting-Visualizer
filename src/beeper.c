@@ -4,6 +4,41 @@
 #include <stdio.h>
 #include "beeper.h"
 
+static double osc(int type, double x)
+{
+    switch (type)
+    {
+    case 0:
+        return sin(x);
+        break;
+    case 1:
+        return sin(x) < 0.0 ? -1.0 : 1.0;
+        break;
+    default:
+        return 0.0;
+        break;
+    }
+}
+
+static void AddSamples(Beeper *beeper, Sint16 *stream, int len)
+{
+    memset(stream, 0, len / sizeof(Sint16));
+    int samples = len / sizeof(Sint16);
+    for (int i = 0; i < samples; i++)
+    {
+        double x = (2.0 * M_PI * (beeper->sample_played + i) / beeper->sample_rate) * beeper->tone;
+        stream[i] = (Sint16)(beeper->amplitude / 2 * osc(1, x));
+    }
+    beeper->sample_played += samples;
+}
+
+void AudioCallBack(void *user_data, Uint8 *stream, int len)
+{
+    AddSamples((Beeper *)user_data, (Sint16 *)stream, len);
+}
+
+//---------------------------------------------------------------------------------------------------
+
 Beeper *InitializeBepper(int buffer, int amplitude, int sample_rate, int channel, float tone)
 {
     Beeper *beeper = (Beeper *)malloc(sizeof(Beeper));
@@ -48,46 +83,6 @@ int RequestDevice(Beeper *beeper)
 void AddTone(Beeper *beeper, float freq)
 {
     beeper->tone = freq;
-}
-
-double osc(int type, double x)
-{
-    switch (type)
-    {
-    case 0:
-        return sin(x);
-        break;
-    case 1:
-        return sin(x) < 0.0 ? -1.0 : 1.0;
-    default:
-        break;
-    }
-}
-double Fade(Beeper *beeper, double *amp)
-{
-    if (*amp < AMPLITUDE && beeper->SoundOn)
-        *amp = *amp + 10;
-    else if (*amp > 0.0 && !beeper->SoundOn)
-        *amp = *amp - 10;
-    return beeper->amplitude;
-}
-
-static void AddSamples(Beeper *beeper, Sint16 *stream, int len)
-{
-    memset(stream, 0, len / sizeof(Sint16));
-    int samples = len / sizeof(Sint16);
-    double amp = 0;
-    for (int i = 0; i < samples; i++)
-    {
-        double x = (2.0 * M_PI * (beeper->sample_played + i) / beeper->sample_rate) * beeper->tone;
-        stream[i] = (Sint16)(beeper->amplitude / 2 * osc(1, x));
-    }
-    beeper->sample_played += samples;
-}
-
-void AudioCallBack(void *user_data, Uint8 *stream, int len)
-{
-    AddSamples((Beeper *)user_data, (Sint16 *)stream, len);
 }
 
 void Beep(Beeper *beeper, int duration, int pause)
