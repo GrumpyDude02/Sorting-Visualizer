@@ -24,7 +24,7 @@ void draw_bars(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp)
         {
             SDL_SetRenderDrawColor(rend, 255, 0, 0, 255);
             arr[i].activity = inactive;
-            float f = map(arr[i].value, 0, sp.bar_number, 90.f, 600.f);
+            float f = map(arr[i].value, 0, sp.bar_number * 2, 90.f, 1200.f);
             AddTone(sp.beeper, f);
             Beep(sp.beeper, 0, 0);
         }
@@ -77,7 +77,7 @@ void bubble_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp,
 void cocktail_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit)
 {
     bool swap_flag = true;
-    for (int i = 0; i < sp.bar_number && swap_flag; i++)
+    for (int i = 0; i < sp.bar_number /*&& swap_flag*/; i++)
     {
         swap_flag = false;
         for (int j = i; j < sp.bar_number - i - 1; j++)
@@ -88,7 +88,7 @@ void cocktail_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams s
                 *quit = true;
                 return;
             }
-            arr[j].activity = compare1;
+            arr[j].activity = compare2;
             arr[j + 1].activity = compare1;
             if (arr[j].value > arr[j + 1].value)
             {
@@ -97,8 +97,8 @@ void cocktail_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams s
             }
             draw_bars(arr, rend, dim, sp);
         }
-        if (!swap_flag)
-            return;
+        // if (!swap_flag)
+        //     return;
         for (int j = sp.bar_number - 1 - i; j >= i + 1; j--)
         {
             SDL_PollEvent(&dim.ev);
