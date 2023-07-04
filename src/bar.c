@@ -175,7 +175,7 @@ static void quick_sort_unpacked(Bar *arr, int starting_index, int ending_index, 
 
 void quick_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit)
 {
-    quick_sort_unpacked(arr, sp.start_index, sp.bar_number, rend, dim, sp, quit);
+    quick_sort_unpacked(arr, sp.start_index, sp.end_index, rend, dim, sp, quit);
 }
 
 // Merge Sort
