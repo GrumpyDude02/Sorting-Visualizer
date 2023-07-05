@@ -8,20 +8,17 @@
 bool exit_program = false;
 ApplicationWindow app;
 
-void catch_sig(int sig)
+void close_programm(void)
 {
-    exit_program = true;
-    fprintf(stdout, "\nCtrl-C pressed\n");
     DestroyApp(&app);
-    exit(0);
 }
 
 int main(int argc, char *argv[])
 {
-    signal(SIGINT, &catch_sig);
+    atexit(&close_programm);
+    SetAppValues(&app, 1200, 600);
     SortingParams sp;
     SDL_zero(sp);
-    SetAppValues(&app, 1200, 600);
     SortingAlgorithm sort[] = {
         {bubble_sort},
         {quick_sort},
@@ -39,19 +36,18 @@ int main(int argc, char *argv[])
     {
         do
         {
-            sp.bar_number = get_int("enter the number of bars (max = 600): ");
+            sp.bar_number = get_int("Enter the number of bars (max = 600): ");
         } while (sp.bar_number <= 0 || sp.bar_number > 600);
         sp.start_index = 0;
         sp.end_index = sp.bar_number - 1;
         do
         {
-            sp.duration = get_int("enter the delay duration (max = 100): ");
+            sp.duration = get_int("Enter the delay duration (max = 100): ");
         } while (sp.duration < 0 || sp.duration > 100);
         if (loop(&app, choice, sp, sort) == -1)
         {
-            return -1;
+            exit(-1);
         }
     }
-    DestroyApp(&app);
-    return 0;
+    exit(0);
 }

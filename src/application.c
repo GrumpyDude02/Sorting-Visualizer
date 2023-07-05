@@ -142,18 +142,20 @@ int loop(ApplicationWindow *app, int choice, SortingParams sp, SortingAlgorithm 
 
 void Deallocate(ApplicationWindow *app)
 {
-    if (app->window)
+    printf("Deallocating\n");
+    if (app->window != NULL)
     {
         SDL_DestroyWindow(app->window);
         app->window = NULL;
     }
-    if (app->renderer)
+    if (app->renderer != NULL)
     {
         SDL_DestroyRenderer(app->renderer);
         app->renderer = NULL;
     }
-    if (app->bars)
+    if (app->bars != NULL)
     {
+        printf("inside bars\n");
         free(app->bars);
         app->bars = NULL;
     }
@@ -162,13 +164,15 @@ void Deallocate(ApplicationWindow *app)
 
 void DestroyApp(ApplicationWindow *app)
 {
-    Deallocate(app);
-    DestroyBeeper(app->beeper);
+    if (app->beeper != NULL)
+        DestroyBeeper(app->beeper);
     app->beeper = NULL;
+    Deallocate(app);
     if (SDL_WasInit(0))
     {
         fprintf(stdout, "Quitting SDL\n");
         SDL_Quit();
+        printf("done");
     }
     return;
 }
