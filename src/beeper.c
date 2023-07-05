@@ -97,8 +97,8 @@ void BeepSound(Beeper *beeper, int duration, int pause)
     }
 }
 
-void DetroyBeeper(Beeper *beeper)
+void DestroyBeeper(Beeper *beeper)
 {
-    SDL_CloseAudio();
+    SDL_CloseAudioDevice(beeper->device);
     free(beeper);
 }

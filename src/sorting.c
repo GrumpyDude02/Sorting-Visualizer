@@ -1,4 +1,4 @@
-#include "bar.h"
+#include "sorting.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -8,11 +8,6 @@ void swap(Bar *b1, Bar *b2)
     Bar temp = *b1;
     *b1 = *b2;
     *b2 = temp;
-}
-
-static float map(float value, float inputMin, float inputMax, float outputMin, float outputMax)
-{
-    return ((value - inputMin) / (inputMax - inputMin)) * (outputMax - outputMin) + outputMin;
 }
 
 bool check_exit(SDL_Event *ev, bool *quit)
@@ -26,53 +21,14 @@ bool check_exit(SDL_Event *ev, bool *quit)
     return false;
 }
 
-void draw_bars(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp)
-{
-    SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
-    SDL_RenderClear(rend);
-    for (int i = sp.start_index; i < sp.bar_number; i++)
-    {
-        if (arr[i].activity == red)
-        {
-            SDL_SetRenderDrawColor(rend, 255, 0, 0, 255);
-            arr[i].activity = inactive;
-            float f = map(arr[i].value, 0, sp.bar_number * 2, 50.f, 1200.f);
-            AddTone(sp.beeper, f);
-            BeepSound(sp.beeper, 0, 0);
-        }
-        else if (arr[i].activity == green)
-        {
-            SDL_SetRenderDrawColor(rend, 0, 255, 0, 255);
-            arr[i].activity = inactive;
-        }
-        else if (arr[i].activity == purple)
-        {
-            SDL_SetRenderDrawColor(rend, 255, 0, 255, 255);
-            arr[i].activity = inactive;
-            float f = map(arr[i].value, 0, sp.bar_number * 2, 50.f, 1200.f);
-            AddTone(sp.beeper, f);
-            BeepSound(sp.beeper, 0, 0);
-        }
-        else
-        {
-            SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
-        }
-        SDL_FRect r = {(float)i * dim.cell_w - 1.0, (float)dim.HEIGHT - (float)arr[i].value * dim.cell_h, dim.cell_w, (float)arr[i].value * dim.cell_h};
-        SDL_RenderFillRectF(rend, &r);
-    }
-    SDL_RenderPresent(rend);
-    SDL_Delay(sp.duration);
-    SDL_PauseAudioDevice(sp.beeper->device, 1);
-}
-
 //-----------------------------sorting algorithms-------------------------
-void bubble_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit)
+void bubble_sort(Bar *arr, ApplicationWindow *app, SortingParams sp)
 {
     for (int i = 0; i < sp.bar_number; i++)
     {
         for (int j = 0; j < sp.bar_number - i - 1; j++)
         {
-            if (check_exit(&dim.ev, quit))
+            if (check_exit(&app->ev, &app->quit))
                 return;
             arr[j].activity = green;
             arr[j + 1].activity = red;
@@ -80,12 +36,12 @@ void bubble_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp,
             {
                 swap(&arr[j], &arr[j + 1]);
             }
-            draw_bars(arr, rend, dim, sp);
+            draw_bars(arr, app, sp);
         }
     }
 }
 
-void cocktail_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit)
+void cocktail_sort(Bar *arr, ApplicationWindow *app, SortingParams sp)
 {
     bool swap_flag = true;
     int i = 0;
@@ -95,7 +51,7 @@ void cocktail_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams s
         for (int j = i; j < sp.bar_number - i - 1; j++)
         {
 
-            if (check_exit(&dim.ev, quit))
+            if (check_exit(&app->ev, &app->quit))
                 return;
             arr[j].activity = green;
             arr[j + 1].activity = red;
@@ -104,14 +60,14 @@ void cocktail_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams s
                 swap(&arr[j], &arr[j + 1]);
                 swap_flag = true;
             }
-            draw_bars(arr, rend, dim, sp);
+            draw_bars(arr, app, sp);
         }
         ++i;
         // if (!swap_flag)
         //     return;
         for (int j = sp.bar_number - 1 - i; j >= i; j--)
         {
-            if (check_exit(&dim.ev, quit))
+            if (check_exit(&app->ev, &app->quit))
                 return;
             arr[j].activity = red;
             arr[j - 1].activity = red;
@@ -120,19 +76,19 @@ void cocktail_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams s
                 swap(&arr[j], &arr[j - 1]);
                 swap_flag = true;
             }
-            draw_bars(arr, rend, dim, sp);
+            draw_bars(arr, app, sp);
         }
     }
 }
 
-void selection_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit)
+void selection_sort(Bar *arr, ApplicationWindow *app, SortingParams sp)
 {
     for (int i = 0; i < sp.bar_number; i++)
     {
         Bar *min = &arr[i];
         for (int j = i; j < sp.bar_number; j++)
         {
-            if (check_exit(&dim.ev, quit))
+            if (check_exit(&app->ev, &app->quit))
                 return;
             arr[j].activity = red;
             if (min->value >= arr[j].value)
@@ -140,7 +96,7 @@ void selection_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams 
                 min = &arr[j];
             }
             min->activity = green;
-            draw_bars(arr, rend, dim, sp);
+            draw_bars(arr, app, sp);
         }
         Bar temp = *min;
         *min = arr[i];
@@ -148,7 +104,7 @@ void selection_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams 
     }
 }
 
-void insertion_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit)
+void insertion_sort(Bar *arr, ApplicationWindow *app, SortingParams sp)
 {
     for (int i = 1; i < sp.bar_number; i++)
     {
@@ -156,24 +112,24 @@ void insertion_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams 
         int j = i - 1;
         while (j >= 0 && arr[j].value > key.value)
         {
-            if (check_exit(&dim.ev, quit))
+            if (check_exit(&app->ev, &app->quit))
                 return;
             arr[j].activity = red;
             arr[j + 1] = arr[j];
             arr[i].activity = green;
             j--;
-            draw_bars(arr, rend, dim, sp);
+            draw_bars(arr, app, sp);
         }
         arr[j + 1] = key;
     }
 }
 
-void gnome_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit)
+void gnome_sort(Bar *arr, ApplicationWindow *app, SortingParams sp)
 {
     int i = 0;
     while (i < sp.bar_number)
     {
-        if (check_exit(&dim.ev, quit))
+        if (check_exit(&app->ev, &app->quit))
             return;
         arr[i].activity = red;
         if (i == 0 || arr[i - 1].value <= arr[i].value)
@@ -183,11 +139,11 @@ void gnome_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, 
             swap(&arr[i], &arr[i - 1]);
             --i;
         }
-        draw_bars(arr, rend, dim, sp);
+        draw_bars(arr, app, sp);
     }
 }
 
-void odd_even_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit)
+void odd_even_sort(Bar *arr, ApplicationWindow *app, SortingParams sp)
 {
     bool swap_flag = true;
     while (swap_flag)
@@ -195,7 +151,7 @@ void odd_even_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams s
         swap_flag = false;
         for (int i = 1; i < sp.bar_number - 1; i += 2)
         {
-            if (check_exit(&dim.ev, quit))
+            if (check_exit(&app->ev, &app->quit))
                 return;
             arr[i].activity = red;
             arr[i + 1].activity = red;
@@ -204,11 +160,11 @@ void odd_even_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams s
                 swap(&arr[i], &arr[i + 1]);
                 swap_flag = true;
             }
-            draw_bars(arr, rend, dim, sp);
+            draw_bars(arr, app, sp);
         }
         for (int i = 0; i < sp.bar_number - 1; i += 2)
         {
-            if (check_exit(&dim.ev, quit))
+            if (check_exit(&app->ev, &app->quit))
                 return;
             arr[i].activity = red;
             if (arr[i].value > arr[i + 1].value)
@@ -216,12 +172,12 @@ void odd_even_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams s
                 swap(&arr[i], &arr[i + 1]);
                 swap_flag = true;
             }
-            draw_bars(arr, rend, dim, sp);
+            draw_bars(arr, app, sp);
         }
     }
 }
 
-void shell_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit)
+void shell_sort(Bar *arr, ApplicationWindow *app, SortingParams sp)
 {
     for (int i = sp.bar_number / 2; i > 0; i /= 2)
     {
@@ -232,19 +188,19 @@ void shell_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, 
             int k;
             for (k = j; k >= i && arr[k - i].value > temp.value; k -= i)
             {
-                if (check_exit(&dim.ev, quit))
+                if (check_exit(&app->ev, &app->quit))
                     return;
                 arr[k] = arr[k - i];
                 arr[k].activity = red;
                 ptr->activity = purple;
-                draw_bars(arr, rend, dim, sp);
+                draw_bars(arr, app, sp);
             }
             arr[k] = temp;
         }
     }
 }
 
-void bogo_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit)
+void bogo_sort(Bar *arr, ApplicationWindow *app, SortingParams sp)
 {
     bool sorted = false;
     while (!sorted)
@@ -252,22 +208,22 @@ void bogo_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, b
         srand(time(NULL));
         for (int i = 0; i < sp.bar_number; i++)
         {
-            if (check_exit(&dim.ev, quit))
+            if (check_exit(&app->ev, &app->quit))
                 return;
             int j = rand() / (RAND_MAX / (sp.bar_number - i) + 1);
             arr[i].activity = purple;
             arr[i].activity = purple;
             swap(&arr[i], &arr[j]);
-            draw_bars(arr, rend, dim, sp);
+            draw_bars(arr, app, sp);
         }
         sorted = true;
         int i = 0;
         while (i < sp.bar_number - 1 && sorted)
         {
-            if (check_exit(&dim.ev, quit))
+            if (check_exit(&app->ev, &app->quit))
                 return;
             arr[i].activity = red;
-            draw_bars(arr, rend, dim, sp);
+            draw_bars(arr, app, sp);
             if (arr[i].value > arr[i + 1].value)
                 sorted = false;
             i++;
@@ -277,9 +233,9 @@ void bogo_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, b
 
 // QuickSort ------------------------------------------------------------------------
 
-static void quick_sort_unpacked(Bar *arr, int starting_index, int ending_index, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit)
+static void quick_sort_unpacked(Bar *arr, int starting_index, int ending_index, ApplicationWindow *app, SortingParams sp)
 {
-    if (*quit)
+    if (app->quit)
         return;
     if (starting_index >= ending_index)
         return;
@@ -288,7 +244,7 @@ static void quick_sort_unpacked(Bar *arr, int starting_index, int ending_index, 
     arr[ending_index].activity = green;
     for (int i = starting_index; i < ending_index; i++)
     {
-        if (check_exit(&dim.ev, quit))
+        if (check_exit(&app->ev, &app->quit))
             return;
         arr[pivot_index].activity = red;
         arr[i].activity = red;
@@ -297,24 +253,24 @@ static void quick_sort_unpacked(Bar *arr, int starting_index, int ending_index, 
             swap(&arr[i], &arr[pivot_index]);
             pivot_index++;
         };
-        draw_bars(arr, rend, dim, sp);
+        draw_bars(arr, app, sp);
     }
     swap(&arr[pivot_index], &arr[ending_index]);
 
-    quick_sort_unpacked(arr, starting_index, pivot_index - 1, rend, dim, sp, quit);
-    quick_sort_unpacked(arr, pivot_index + 1, ending_index, rend, dim, sp, quit);
+    quick_sort_unpacked(arr, starting_index, pivot_index - 1, app, sp);
+    quick_sort_unpacked(arr, pivot_index + 1, ending_index, app, sp);
 }
 
-void quick_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit)
+void quick_sort(Bar *arr, ApplicationWindow *app, SortingParams sp)
 {
-    quick_sort_unpacked(arr, sp.start_index, sp.end_index, rend, dim, sp, quit);
+    quick_sort_unpacked(arr, sp.start_index, sp.end_index, app, sp);
 }
 //-----------------------------------------------------------------------------------
 
 // Merge Sort------------------------------------------------------------------------
-static void merge(Bar *arr, SDL_Renderer *rend, int start, int mid, int end, WindowProp dim, SortingParams sp, bool *quit)
+static void merge(Bar *arr, int start, int mid, int end, ApplicationWindow *app, SortingParams sp)
 {
-    if (check_exit(&dim.ev, quit))
+    if (check_exit(&app->ev, &app->quit))
         return;
     int n1 = mid - start + 1;
     int n2 = end - mid;
@@ -323,8 +279,8 @@ static void merge(Bar *arr, SDL_Renderer *rend, int start, int mid, int end, Win
     int i = 0, j = 0, k = 0;
     while (i < n1 || j < n2)
     {
-        check_exit(&dim.ev, quit);
-        if (*quit)
+        check_exit(&app->ev, &app->quit);
+        if (app->quit)
             return;
 
         if (i < n1 && (j >= n2 || arr[start + i].value < arr[mid + 1 + j].value))
@@ -337,31 +293,31 @@ static void merge(Bar *arr, SDL_Renderer *rend, int start, int mid, int end, Win
             arr[mid + 1 + j].activity = red;
             temp[k++] = arr[mid + 1 + j++];
         }
-        draw_bars(arr, rend, dim, sp);
+        draw_bars(arr, app, sp);
     }
 
     for (int t = 0; t < k; t++)
     {
-        if (check_exit(&dim.ev, quit))
+        if (check_exit(&app->ev, &app->quit))
             return;
         arr[start + t] = temp[t];
-        draw_bars(arr, rend, dim, sp);
+        draw_bars(arr, app, sp);
     }
 }
 
-static void merge_sort_unpacked(Bar *arr, SDL_Renderer *rend, int start, int end, WindowProp dim, SortingParams sp, bool *quit)
+static void merge_sort_unpacked(Bar *arr, int start, int end, ApplicationWindow *app, SortingParams sp)
 {
-    if (start >= end || *quit)
+    if (start >= end || app->quit)
     {
         return;
     }
     int mid = (start + end) / 2;
-    merge_sort_unpacked(arr, rend, start, mid, dim, sp, quit);
-    merge_sort_unpacked(arr, rend, mid + 1, end, dim, sp, quit);
-    merge(arr, rend, start, mid, end, dim, sp, quit);
+    merge_sort_unpacked(arr, start, mid, app, sp);
+    merge_sort_unpacked(arr, mid + 1, end, app, sp);
+    merge(arr, start, mid, end, app, sp);
 }
 
-void merge_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit)
+void merge_sort(Bar *arr, ApplicationWindow *app, SortingParams sp)
 {
-    merge_sort_unpacked(arr, rend, sp.start_index, sp.end_index, dim, sp, quit);
+    merge_sort_unpacked(arr, sp.start_index, sp.end_index, app, sp);
 }

@@ -1,29 +1,27 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
-#include <math.h>
-#include <windows.h>
 #include <signal.h>
-#include "my_func.h"
-#include "bar.h"
-#include "beeper.h"
+#include "tools.h"
+#include "application.h"
+#include "sorting.h"
 
-bool end_program = false;
+bool exit_program = false;
+ApplicationWindow app;
 
-void handle_exit(int signal)
+void catch_sig(int sig)
 {
-    end_program = true;
+    exit_program = true;
+    fprintf(stdout, "\nCtrl-C pressed\n");
+    DestroyApp(&app);
+    exit(0);
 }
 
 int main(int argc, char *argv[])
 {
-    signal(SIGTERM, handle_exit);
-    SDL_Init(SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_VIDEO);
-    WindowProp dimensions = {1280, 600, 0.0, 0.0};
+    signal(SIGINT, &catch_sig);
     SortingParams sp;
     SDL_zero(sp);
-    sp.beeper = InitializeBepper(BUFFER_SIZE, AMPLITUDE, SAMPLE_RATE, CHANNELS, 440.0f);
-    if (sp.beeper == NULL)
-        return -1;
+    SetAppValues(&app, 1200, 600);
     SortingAlgorithm sort[] = {
         {bubble_sort},
         {quick_sort},
@@ -35,33 +33,25 @@ int main(int argc, char *argv[])
         {odd_even_sort},
         {shell_sort},
         {bogo_sort}};
+
     int choice;
-    while ((choice = get_choice()) != 0 && !end_program)
+    while ((choice = get_choice()) != 0)
     {
         do
         {
-            sp.bar_number = get_int("Enter the number of bars (max = 600) : ");
-        } while (sp.bar_number < 0 || sp.bar_number > 600);
-
-        do
-        {
-            sp.duration = get_int("Enter the delay duration (max = 100): ");
-        } while (sp.duration < 0 || sp.duration > 100);
-
-        dimensions.cell_h = dimensions.HEIGHT / (float)sp.bar_number;
-        dimensions.cell_w = dimensions.WIDTH / (float)sp.bar_number;
+            sp.bar_number = get_int("enter the number of bars (max = 600): ");
+        } while (sp.bar_number <= 0 || sp.bar_number > 600);
         sp.start_index = 0;
         sp.end_index = sp.bar_number - 1;
-        if (render_window(dimensions, choice, sp, sort) == -1)
+        do
         {
-            fprintf(stdout, "ctrl-c\n");
-            DetroyBeeper(sp.beeper);
-            SDL_Quit();
+            sp.duration = get_int("enter the delay duration (max = 100): ");
+        } while (sp.duration < 0 || sp.duration > 100);
+        if (loop(&app, choice, sp, sort) == -1)
+        {
             return -1;
         }
     }
-    fprintf(stdout, "hh\n");
-    DetroyBeeper(sp.beeper);
-    SDL_Quit();
+    DestroyApp(&app);
     return 0;
 }
