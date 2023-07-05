@@ -24,8 +24,10 @@ int get_choice(void)
         printf("(6).Cocktail Sort\n");
         printf("(7).Gnome Sort\n");
         printf("(8).Odd-Even Sort\n");
+        printf("(9).Shell Sort\n");
+        printf("(10).Bogo Sort\n");
         printf("Select the desired sorting algorithm : ");
-    } while (fscanf(stdin, "%d", &choice) != EOF && (choice < 0 || choice > 8));
+    } while (fscanf(stdin, "%d", &choice) != EOF && (choice < 0 || choice > 10));
     return choice;
 }
 

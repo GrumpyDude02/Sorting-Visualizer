@@ -23,7 +23,9 @@ int main(int argc, char *argv[])
         {insertion_sort},
         {cocktail_sort},
         {gnome_sort},
-        {odd_even_sort}};
+        {odd_even_sort},
+        {shell_sort},
+        {bogo_sort}};
     int choice;
     while ((choice = get_choice()) != 0)
     {

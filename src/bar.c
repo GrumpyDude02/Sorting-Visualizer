@@ -1,6 +1,7 @@
 #include "bar.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 void swap(Bar *b1, Bar *b2)
 {
@@ -37,6 +38,9 @@ void draw_bars(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp)
         {
             SDL_SetRenderDrawColor(rend, 255, 0, 255, 255);
             arr[i].activity = inactive;
+            float f = map(arr[i].value, 0, sp.bar_number * 2, 50.f, 1200.f);
+            AddTone(sp.beeper, f);
+            Beep(sp.beeper, 0, 0);
         }
         else
         {
@@ -48,6 +52,18 @@ void draw_bars(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp)
     SDL_RenderPresent(rend);
     SDL_Delay(sp.duration);
     SDL_PauseAudioDevice(sp.beeper->device, 1);
+}
+
+void shuffle(int *array, int n)
+{
+    srand((unsigned)time(NULL));
+    for (int i = 0; i < n - 1; i++)
+    {
+        size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+        int t = array[j];
+        array[j] = array[i];
+        array[i] = t;
+    }
 }
 
 //-----------------------------sorting algorithms-------------------------
@@ -210,6 +226,7 @@ void odd_even_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams s
                 return;
             }
             arr[i].activity = compare1;
+            arr[i + 1].activity = compare1;
             if (arr[i].value > arr[i + 1].value)
             {
                 swap(&arr[i], &arr[i + 1]);
@@ -232,6 +249,72 @@ void odd_even_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams s
                 swap_flag = true;
             }
             draw_bars(arr, rend, dim, sp);
+        }
+    }
+}
+
+void shell_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit)
+{
+    for (int i = sp.bar_number / 2; i > 0; i /= 2)
+    {
+        for (int j = i; j < sp.bar_number; j++)
+        {
+            Bar *ptr = &arr[j];
+            Bar temp = arr[j];
+            int k;
+            for (k = j; k >= i && arr[k - i].value > temp.value; k -= i)
+            {
+                SDL_PollEvent(&dim.ev);
+                if (dim.ev.type == SDL_QUIT)
+                {
+                    *quit = true;
+                    return;
+                }
+                arr[k] = arr[k - i];
+                arr[k].activity = compare1;
+                ptr->activity = pivot_element;
+                draw_bars(arr, rend, dim, sp);
+            }
+            arr[k] = temp;
+        }
+    }
+}
+
+void bogo_sort(Bar *arr, SDL_Renderer *rend, WindowProp dim, SortingParams sp, bool *quit)
+{
+    bool sorted = false;
+    while (!sorted)
+    {
+        srand(time(NULL));
+        for (int i = 0; i < sp.bar_number; i++)
+        {
+            SDL_PollEvent(&dim.ev);
+            if (dim.ev.type == SDL_QUIT)
+            {
+                *quit = true;
+                return;
+            }
+            int j = rand() / (RAND_MAX / (sp.bar_number - i) + 1);
+
+            swap(&arr[i], &arr[j]);
+            draw_bars(arr, rend, dim, sp);
+        }
+        // checking if the array is sorted
+        sorted = true;
+        int i = 0;
+        while (i < sp.bar_number - 1 && sorted)
+        {
+            SDL_PollEvent(&dim.ev);
+            if (dim.ev.type == SDL_QUIT)
+            {
+                *quit = true;
+                return;
+            }
+            arr[i].activity = compare1;
+            draw_bars(arr, rend, dim, sp);
+            if (arr[i].value > arr[i + 1].value)
+                sorted = false;
+            i++;
         }
     }
 }
