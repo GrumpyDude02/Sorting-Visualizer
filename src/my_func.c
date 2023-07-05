@@ -3,31 +3,34 @@
 int get_int(char *text)
 {
     int temp;
+    char buffer[20];
     do
     {
         fprintf(stdout, "%s", text);
-    } while (fscanf(stdin, "%d", &temp) == EOF);
+        fgets(buffer, 19, stdin);
+    } while (sscanf(buffer, "%d", &temp) != 1);
     return temp;
 }
 
 int get_choice(void)
 {
     int choice;
+    fprintf(stdout, "(0).Quit\n");
+    fprintf(stdout, "(1).Bubble Sort\n");
+    fprintf(stdout, "(2).Quick Sort\n");
+    fprintf(stdout, "(3).Selection Sort\n");
+    fprintf(stdout, "(4).Merge Sort\n");
+    fprintf(stdout, "(5).Insertion Sort\n");
+    fprintf(stdout, "(6).Cocktail Sort\n");
+    fprintf(stdout, "(7).Gnome Sort\n");
+    fprintf(stdout, "(8).Odd-Even Sort\n");
+    fprintf(stdout, "(9).Shell Sort\n");
+    fprintf(stdout, "(10).Bogo Sort\n");
     do
     {
-        printf("(0).Quit\n");
-        printf("(1).Bubble Sort\n");
-        printf("(2).Quick Sort\n");
-        printf("(3).Selection Sort\n");
-        printf("(4).Merge Sort\n");
-        printf("(5).Insertion Sort\n");
-        printf("(6).Cocktail Sort\n");
-        printf("(7).Gnome Sort\n");
-        printf("(8).Odd-Even Sort\n");
-        printf("(9).Shell Sort\n");
-        printf("(10).Bogo Sort\n");
-        printf("Select the desired sorting algorithm : ");
-    } while (fscanf(stdin, "%d", &choice) != EOF && (choice < 0 || choice > 10));
+        choice = get_int("Select the desired sorting algorithm : ");
+
+    } while (choice < 0 || choice > 10);
     return choice;
 }
 
@@ -39,7 +42,7 @@ int render_window(WindowProp dimensions, int choice, SortingParams sp, SortingAl
     if (!bars)
         return -1;
 
-    SDL_Window *window = SDL_CreateWindow("placeholder", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, dimensions.WIDTH, dimensions.HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
+    SDL_Window *window = SDL_CreateWindow("Sorting Visulizer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, dimensions.WIDTH, dimensions.HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
     if (!window)
     {
         printf("failed to initilize window\n");

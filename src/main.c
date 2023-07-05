@@ -1,19 +1,28 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <math.h>
+#include <windows.h>
+#include <signal.h>
 #include "my_func.h"
 #include "bar.h"
 #include "beeper.h"
 
+bool end_program = false;
+
+void handle_exit(int signal)
+{
+    end_program = true;
+}
+
 int main(int argc, char *argv[])
 {
+    signal(SIGTERM, handle_exit);
     SDL_Init(SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_VIDEO);
     WindowProp dimensions = {1280, 600, 0.0, 0.0};
     SortingParams sp;
     SDL_zero(sp);
-    Beeper *beep = InitializeBepper(BUFFER_SIZE, AMPLITUDE, SAMPLE_RATE, CHANNELS, 440.0f);
-    sp.beeper = beep;
-    if (beep == NULL)
+    sp.beeper = InitializeBepper(BUFFER_SIZE, AMPLITUDE, SAMPLE_RATE, CHANNELS, 440.0f);
+    if (sp.beeper == NULL)
         return -1;
     SortingAlgorithm sort[] = {
         {bubble_sort},
@@ -27,7 +36,7 @@ int main(int argc, char *argv[])
         {shell_sort},
         {bogo_sort}};
     int choice;
-    while ((choice = get_choice()) != 0)
+    while ((choice = get_choice()) != 0 && !end_program)
     {
         do
         {
@@ -45,12 +54,14 @@ int main(int argc, char *argv[])
         sp.end_index = sp.bar_number - 1;
         if (render_window(dimensions, choice, sp, sort) == -1)
         {
-            DetroyBeeper(beep);
+            fprintf(stdout, "ctrl-c\n");
+            DetroyBeeper(sp.beeper);
             SDL_Quit();
             return -1;
         }
     }
-    DetroyBeeper(beep);
+    fprintf(stdout, "hh\n");
+    DetroyBeeper(sp.beeper);
     SDL_Quit();
     return 0;
 }

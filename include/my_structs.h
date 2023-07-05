@@ -4,9 +4,10 @@
 typedef enum
 {
     inactive,
-    compare1,
-    compare2,
-    pivot_element,
+    red,
+    green,
+    purple,
+    blue,
 } color_index;
 
 typedef struct ScreenDimensions

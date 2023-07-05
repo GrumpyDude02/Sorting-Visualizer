@@ -85,7 +85,7 @@ void AddTone(Beeper *beeper, float freq)
     beeper->tone = freq;
 }
 
-void Beep(Beeper *beeper, int duration, int pause)
+void BeepSound(Beeper *beeper, int duration, int pause)
 {
     beeper->SoundOn = 1;
     SDL_PauseAudioDevice(beeper->device, 0);

@@ -24,7 +24,7 @@ typedef struct Beeper
 Beeper *InitializeBepper(int buffer, int amplitude, int sample_rate, int channel, float tone);
 int RequestDevice(Beeper *beeper);
 void AddTone(Beeper *beeper, float freq);
-void Beep(Beeper *beeper, int duration, int pause);
+void BeepSound(Beeper *beeper, int duration, int pause);
 void DetroyBeeper(Beeper *beeper);
 void AudioCallBack(void *beeper, Uint8 *stream, int len);
 
