@@ -2,7 +2,7 @@
 #ifndef BEEPER_H
 #define BEEPER_H
 
-#define AMPLITUDE 500
+#define AMPLITUDE 1000
 #define CHANNELS 1
 #define SAMPLE_RATE 44100
 #define BUFFER_SIZE 4096
