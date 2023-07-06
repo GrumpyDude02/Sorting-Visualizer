@@ -25,49 +25,17 @@ A simple sorting visualizer with sound developed as a final project for the cs50
 
 ## Demo:
 
-- Exemple 1 : Merge Sort - 150 bars - 20ms delay.
+- Exemple 1: Merge Sort - 150 bars - 20ms delay.
 
-```
-(0).Quit
-(1).Bubble Sort
-(2).Quick Sort
-(3).Selection Sort
-(4).Merge Sort
-(5).Insertion Sort
-(6).Cocktail Sort
-(7).Gnome Sort
-(8).Odd-Even Sort
-(9).Shell Sort
-(10).Bogo Sort
-Select the desired sorting algorithm : 4
-Enter the number of bars (max = 600): 150
-Enter the delay duration (max = 100): 20
-```
-
-[//]:#![](https://github.com/Sorting-Visulizer/gifs/merge_sort_demo.gif)
 ![](/gifs/merge_sort_demo.gif)
 
-- Exemple 2 : Cocktail Sort - 80 bars - 4ms delay.
+- Exemple 2: Cocktail Sort - 80 bars - 4ms delay.
 
-```
-(0).Quit
-(1).Bubble Sort
-(2).Quick Sort
-(3).Selection Sort
-(4).Merge Sort
-(5).Insertion Sort
-(6).Cocktail Sort
-(7).Gnome Sort
-(8).Odd-Even Sort
-(9).Shell Sort
-(10).Bogo Sort
-Select the desired sorting algorithm : 6
-Enter the number of bars (max = 600): 80
-Enter the delay duration (max = 100): 4
-```
-
-[//]:#![](https://github.com/Sorting-Visulizer/gifs/cocktail_sort_demo.gif)
 ![](/gifs/cocktail_sort_demo.gif)
+
+- Exemple 3: Inerstion Sort - 100 bars - 5ms delay.
+
+![](/gifs/insertion_sort_demo.gif)
 
 ## Usage
 
@@ -93,5 +61,10 @@ git clone https://github.com/GrumpyDude02/Sorting-Visualizer.git
 ```
 
 - Download SDL 2 version compatible with your C compiler (https://github.com/libsdl-org/SDL/releases/tag/release-2.28.0). Make sure to use the files corresponding to your computer's architecture.
-- When bulding link the the sdl2 library.
+- When bulding link the the sdl2 library using
+
+```
+-lSDL2 -lSDL2main -lmingw32(if using mingw)
+```
+
 - The executable file and the SDL2.dll file should be in the same directory.
