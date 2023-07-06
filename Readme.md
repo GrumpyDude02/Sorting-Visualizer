@@ -1,8 +1,6 @@
 # Sorting Visulizer
 
-A simple sorting visualizer made as a final project for the cs50x course.
-
-The project was made with SDL2 framework using the C programming language.
+A simple sorting visualizer with sound developed as a final project for the cs50x course. It provides the possibility to visualize various sorting algorithms in action making it easy to understand how each algorithm works.
 
 ## Available sorting a algorithms:
 
@@ -18,14 +16,16 @@ The project was made with SDL2 framework using the C programming language.
 
 ## Features:
 
+- Visualization of popular sorting algorithms.
 - Synchronised sound with sorting.
 - Ability to change the delay between each iteration (the delay is the duration of the sound).
 - Ability to change the number of bars drawn at the screen (limit 600).
 - Modular code making it easy to add sorting algorithms in the future.
+- Written in C programming language.
 
 ## Demo:
 
-place holder
+- Exemple 1 : Bubble Sort
 
 ## Usage
 
@@ -37,7 +37,7 @@ place holder
 - The window can be closed at any time, but the terminal window will still be open asking the user to chose an algorithm.
 - The program can closed by pressing on the number key 0 when prompted to chose an algorithm.
 
-## Requirements:
+## Made Using:
 
 - SDL2 devel 2.28.0 mingw.
 - Compiler: gcc version 12.2.0 (x86_64-posix-seh-rev2, Built by MinGW-W64 project).
