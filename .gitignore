@@ -1,4 +1,4 @@
 .vscode
-SDL2
+SDL2/
 lib
 bin
