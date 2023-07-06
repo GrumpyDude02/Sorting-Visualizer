@@ -45,7 +45,7 @@ A simple sorting visualizer with sound developed as a final project for the cs50
 - A third prompt will appear asking for the delay duration in miliseconds.
 - An SDL window will where the bars are drawn and changing position on each iteration of the selected algorithm.
 - The window can be closed at any time, but the terminal window will still be open asking the user to chose an algorithm.
-- The program can closed by pressing on the number key 0 when prompted to chose an algorithm.
+- The program can be closed by pressing on the number key 0 when prompted to chose an algorithm.
 
 ## Made Using:
 
