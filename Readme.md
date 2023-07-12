@@ -51,6 +51,7 @@ A simple sorting visualizer with sound developed as a final project for the cs50
 
 - SDL2 devel 2.28.0 mingw (https://github.com/libsdl-org/SDL/releases/tag/release-2.28.0).
 - Compiler: gcc version 12.2.0 (x86_64-posix-seh-rev2, Built by MinGW-W64 project).
+- Windows 10 22H2 build: 19045.3208 / Windows 11 22H2 build : 22621.1928.
 
 ## How to Build:
 
@@ -60,11 +61,6 @@ A simple sorting visualizer with sound developed as a final project for the cs50
 git clone https://github.com/GrumpyDude02/Sorting-Visualizer.git
 ```
 
-- Download SDL 2 version compatible with your C compiler (https://github.com/libsdl-org/SDL/releases/tag/release-2.28.0). Make sure to use the files corresponding to your computer's architecture.
-- When bulding link the the sdl2 library using
-
-```
--lSDL2 -lSDL2main -lmingw32(if using mingw)
-```
-
+- Download SDL 2 version compatible with your C compiler and system (https://github.com/libsdl-org/SDL/releases/tag/release-2.28.0). Make sure to use the files corresponding to your computer's architecture.
+- Link the the sdl2 library when building.
 - The executable file and the SDL2.dll file should be in the same directory.
