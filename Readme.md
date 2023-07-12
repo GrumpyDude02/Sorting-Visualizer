@@ -62,5 +62,5 @@ git clone https://github.com/GrumpyDude02/Sorting-Visualizer.git
 ```
 
 - Download SDL 2 version compatible with your C compiler and system (https://github.com/libsdl-org/SDL/releases/tag/release-2.28.0). Make sure to use the files corresponding to your computer's architecture.
-- Link the the sdl2 library when building.
+- Link the the sdl2 library when building (the flags depend on the system).
 - The executable file and the SDL2.dll file should be in the same directory.
